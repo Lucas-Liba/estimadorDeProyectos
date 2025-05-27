@@ -13,7 +13,7 @@ const projectItems = [
             { name: "Reports & Dashboards", best: 6, mid: 12, worst: 20, hasQuantity: false },
             { name: "Custom Object ", best: 6, mid: 12, worst: 20, hasQuantity: true },
             { name: "Migración desde CSV ", best: 2, mid: 4, worst: 8, hasQuantity: true },
-            { name: "Automatizaciones básicas (flows, rules, emails)", best: 4, mid: 6, worst: 12, hasQuantity: false },
+            { name: "Automatizaciones básicas (flows, rules, emails)", best: 4, mid: 6, worst: 12, hasQuantity: true },
             { name: "Integración externa (ERP, Bot, etc.)", best: 60, mid: 100, worst: 200, hasQuantity: true },
             { name: "Documentación (manuales, checklist)", best: 15, mid: 20, worst: 30, hasQuantity: false },
             { name: "Capacitación (usuarios + admins)", best: 8, mid: 12, worst: 20, hasQuantity: false },
