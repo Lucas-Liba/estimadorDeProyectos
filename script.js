@@ -107,11 +107,10 @@
                 const hoursDisplay = document.querySelector(`.hours-display[data-index="${index}"]`);
                 checkbox.checked ? (promptReq = promptReq + item.name + "estimado: " + complexitySelect.value + " Horas:" + hoursDisplay.textContent + "\n") : promptReq;
             })
-            
             const finalPrompt=estimatePrompt.concat(promptTime,promptReq)
             navigator.clipboard.writeText(finalPrompt)
                 .then(e=>console.log("Ok"))
-                .then(copyMessage.textContent="Copiado")
+                .then(copyMessage.textContent="Copiado al portapapeles")
                 .catch(e=>console.log("Failed"))
                 .catch(e=>copyMessage.textContent="Error")
         }
