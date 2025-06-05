@@ -1,0 +1,15 @@
+.navv{
+    position: fixed;
+    top: 15px;
+    z-index: 2;
+}
+
+.navv a {
+    text-decoration:none ;
+    padding: 10px;
+    background-color: rgb(39, 121, 175);
+    color: white;
+    border-radius: 10px;
+    
+
+}
