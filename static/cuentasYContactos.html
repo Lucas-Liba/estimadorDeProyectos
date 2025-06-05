@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesforce: Cuentas y Contactos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .presentation-container {
+            max-width: 900px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .slide {
+            padding: 60px;
+            min-height: 600px;
+            display: none;
+            position: relative;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .slide h1 {
+            color: #1976d2;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .slide h2 {
+            color: #1976d2;
+            font-size: 2em;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #e3f2fd;
+            padding-bottom: 10px;
+        }
+
+        .slide h3 {
+            color: #424242;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+        }
+
+        .slide p, .slide li {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .slide ul {
+            margin-left: 30px;
+            margin-bottom: 25px;
+        }
+
+        .slide li {
+            margin-bottom: 10px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border-left: 5px solid #1976d2;
+        }
+
+        .example-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .questions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .question-card {
+            background: #fff3e0;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ff9800;
+        }
+
+        .question-card h4 {
+            color: #e65100;
+            margin-bottom: 10px;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            background: rgba(255,255,255,0.9);
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn {
+            padding: 12px 20px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #1565c0;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slide-counter {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: #1976d2;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .salesforce-logo {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .relationship-diagram {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 1.2em;
+        }
+
+        .arrow {
+            color: #1976d2;
+            font-size: 2em;
+            margin: 0 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="slide-counter" id="slideCounter">1 / 8</div>
+
+        <!-- Slide 1: Título -->
+        <div class="slide active">
+            <div class="salesforce-logo">
+                <h1>🏢 Salesforce</h1>
+                <h2 style="text-align: center; color: #666;">Cuentas y Contactos</h2>
+            </div>
+            <div class="highlight-box">
+                <h3>Objetivo del Relevamiento</h3>
+                <p>Entender la estructura actual de información de clientes y definir la mejor configuración para maximizar el valor de Salesforce CRM.</p>
+            </div>
+            <div style="text-align: center; margin-top: 40px; color: #666;">
+        
+        
+            </div>
+        </div>
+
+        <!-- Slide 2: ¿Qué son las Cuentas? -->
+        <div class="slide">
+            <h2>🏢 ¿Qué son las Cuentas en Salesforce?</h2>
+            <div class="highlight-box">
+                <p><strong>Las Cuentas representan las empresas u organizaciones con las que tu negocio tiene relación.</strong></p>
+            </div>
+            
+            <h3>Características principales:</h3>
+            <ul>
+                <li><strong>Entidad central:</strong> Punto de referencia para toda la información comercial</li>
+                <li><strong>Información corporativa:</strong> Datos de la empresa, industria, tamaño, ubicación</li>
+                <li><strong>Historial completo:</strong> Todas las interacciones, oportunidades y actividades</li>
+                <li><strong>Jerarquías:</strong> Permite crear estructuras de empresas matriz y filiales</li>
+            </ul>
+
+            <div class="example-box">
+                <h4>💡 Ejemplo:</h4>
+                <p><strong>Cuenta:</strong> "Banco Santander Argentina"<br>
+                <strong>Incluye:</strong> Dirección corporativa, industria (Servicios Financieros), ingresos anuales, número de empleados, territorio asignado, etc.</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: ¿Qué son los Contactos? -->
+        <div class="slide">
+            <h2>👤 ¿Qué son los Contactos en Salesforce?</h2>
+            <div class="highlight-box">
+                <p><strong>Los Contactos son las personas individuales dentro de las Cuentas con quienes interactúas.</strong></p>
+            </div>
+            
+            <h3>Características principales:</h3>
+            <ul>
+                <li><strong>Personas reales:</strong> Individuos específicos con nombre, cargo y datos de contacto</li>
+                <li><strong>Roles y responsabilidades:</strong> Función dentro de la organización</li>
+                <li><strong>Preferencias de comunicación:</strong> Email, teléfono, redes sociales</li>
+                <li><strong>Historial de interacciones:</strong> Emails, llamadas, reuniones</li>
+            </ul>
+
+            <div class="example-box">
+                <h4>💡 Ejemplo:</h4>
+                <p><strong>Contacto:</strong> "María González"<br>
+                <strong>Cuenta:</strong> Banco Santander Argentina<br>
+                <strong>Cargo:</strong> Directora de Tecnología<br>
+                <strong>Incluye:</strong> Email, teléfono, preferencias de comunicación, historial de reuniones</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Relación entre Cuentas y Contactos -->
+        <div class="slide">
+            <h2>🔗 Relación entre Cuentas y Contactos</h2>
+            
+            <div class="relationship-diagram">
+                <div style="background: #e3f2fd; padding: 20px; border-radius: 10px; display: inline-block;">
+                    <strong>🏢 CUENTA</strong><br>
+                    Empresa/Organización
+                </div>
+                <span class="arrow">➡️</span>
+                <div style="background: #fff3e0; padding: 20px; border-radius: 10px; display: inline-block;">
+                    <strong>👤 CONTACTOS</strong><br>
+                    Personas dentro de la empresa
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Relación 1:N (Uno a Muchos)</h3>
+                <p>Una Cuenta puede tener múltiples Contactos, pero cada Contacto pertenece a una sola Cuenta principal.</p>
+            </div>
+
+            <h3>Beneficios de esta estructura:</h3>
+            <ul>
+                <li><strong>Vista 360°:</strong> Información completa de la organización y sus personas clave</li>
+                <li><strong>Seguimiento integral:</strong> Historial unificado de todas las interacciones</li>
+                <li><strong>Mejor colaboración:</strong> Todo el equipo ve la misma información</li>
+                <li><strong>Reporting avanzado:</strong> Análisis por empresa, persona o combinación</li>
+            </ul>
+        </div>
+
+        <!-- Slide 5: Beneficios del Modelo -->
+        <div class="slide">
+            <h2>✨ Beneficios del Modelo de Cuentas y Contactos</h2>
+            
+            <div class="questions-grid">
+                <div class="question-card">
+                    <h4>📊 Visibilidad Completa</h4>
+                    <p>Historial unificado de todas las interacciones con cada cliente y sus contactos clave.</p>
+                </div>
+                <div class="question-card">
+                    <h4>🎯 Segmentación Avanzada</h4>
+                    <p>Posibilidad de segmentar por tipo de empresa, industria, tamaño, y características de contactos.</p>
+                </div>
+                <div class="question-card">
+                    <h4>🤝 Mejor Colaboración</h4>
+                    <p>Todo el equipo accede a la misma información actualizada sobre cuentas y contactos.</p>
+                </div>
+                <div class="question-card">
+                    <h4>📈 Reportes Inteligentes</h4>
+                    <p>Análisis cruzado entre datos de empresa y comportamiento de contactos individuales.</p>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>🎯 Resultado Final</h3>
+                <p>Mayor efectividad en ventas, mejor atención al cliente y decisiones basadas en datos completos y organizados.</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Preguntas Exploratorias - Cuentas -->
+        <div class="slide">
+            <h2>❓ Preguntas Exploratorias: Cuentas</h2>
+            
+            <h3>📋 Información Básica</h3>
+            <ul>
+                <li>¿Cómo clasifican actualmente a sus clientes? (por tamaño, industria, región, etc.)</li>
+                <li>¿Tienen clientes corporativos y individuales, o solo uno de estos tipos?</li>
+                <li>¿Manejan cuentas con estructura de matriz-filiales?</li>
+                <li>¿Qué información consideran más importante de cada cliente?</li>
+            </ul>
+
+            <h3>🔄 Procesos Actuales</h3>
+            <ul>
+                <li>¿Cómo crean y actualizan la información de nuevos clientes?</li>
+                <li>¿Quién es responsable de mantener actualizada la información de cuentas?</li>
+                <li>¿Tienen territorios o asignaciones específicas por vendedor/región?</li>
+                <li>¿Cómo miden el valor o potencial de cada cuenta?</li>
+            </ul>
+        </div>
+
+        <!-- Slide 7: Preguntas Exploratorias - Contactos -->
+        <div class="slide">
+            <h2>❓ Preguntas Exploratorias: Contactos</h2>
+            
+            <h3>👥 Información de Contactos</h3>
+            <ul>
+                <li>¿Cuántos contactos manejan típicamente por cliente?</li>
+                <li>¿Identifican roles específicos? (decisor, influenciador, usuario final, etc.)</li>
+                <li>¿Cómo registran las preferencias de comunicación de cada contacto?</li>
+                <li>¿Necesitan hacer seguimiento de contactos que cambian de empresa?</li>
+            </ul>
+
+            <h3>📞 Interacciones y Comunicación</h3>
+            <ul>
+                <li>¿Qué tipos de interacciones registran? (llamadas, emails, reuniones, etc.)</li>
+                <li>¿Cómo coordinan cuando múltiples personas del equipo contactan al mismo cliente?</li>
+                <li>¿Necesitan integración con email marketing o herramientas de comunicación?</li>
+                <li>¿Requieren consentimiento para comunicaciones (GDPR/privacidad)?</li>
+            </ul>
+        </div>
+
+        <!-- Slide 8: Próximos Pasos -->
+        <div class="slide">
+            <h2>🚀 Próximos Pasos</h2>
+            
+            <div class="highlight-box">
+                <h3>🎯 Objetivo del Relevamiento</h3>
+                <p>Con sus respuestas podremos diseñar la estructura óptima de Cuentas y Contactos para su organización.</p>
+            </div>
+
+            <h3>📅 Plan de Trabajo</h3>
+            <ul>
+                <li><strong>Sesión de Discovery:</strong> Revisión detallada de respuestas y procesos actuales</li>
+                <li><strong>Mapeo de Datos:</strong> Identificación de campos y estructura necesaria</li>
+                <li><strong>Diseño de Solución:</strong> Propuesta de configuración óptima</li>
+                <li><strong>Plan de Migración:</strong> Estrategia para transferir datos existentes</li>
+                <li><strong>Capacitación:</strong> Entrenamiento del equipo en el nuevo sistema</li>
+            </ul>
+
+            <div class="example-box">
+                <h4>💬 ¿Preguntas?</h4>
+                <p>Estamos aquí para aclarar cualquier duda sobre Cuentas, Contactos o el proceso de implementación de Salesforce.</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <strong style="color: #1976d2; font-size: 1.2em;">¡Comencemos a transformar su gestión de clientes!</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">⬅️ Anterior</button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Siguiente ➡️</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            if (direction === 1 && currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            } else if (direction === -1 && currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        // Navegación con teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+
+        // Inicializar
+        showSlide(0);
+    </script>
+</body>
+</html>
