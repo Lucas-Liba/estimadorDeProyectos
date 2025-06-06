@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesforce Security Model - Roles, Perfiles y Permisos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .presentation-container {
+            max-width: 1100px;
+            width: 95%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .slide {
+            display: none;
+            padding: 50px 45px;
+            min-height: 650px;
+            position: relative;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide h1 {
+            color: #1f2937;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 3px solid #2a5298;
+            padding-bottom: 20px;
+        }
+
+        .slide h2 {
+            color: #374151;
+            font-size: 2rem;
+            margin-bottom: 25px;
+            border-left: 5px solid #2a5298;
+            padding-left: 20px;
+        }
+
+        .slide h3 {
+            color: #4b5563;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            margin-top: 25px;
+        }
+
+        .slide p, .slide li {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #6b7280;
+            margin-bottom: 15px;
+        }
+
+        .slide ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .slide li {
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .slide li::before {
+            content: "→";
+            color: #2a5298;
+            font-weight: bold;
+            position: absolute;
+            left: -20px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-left: 5px solid #2a5298;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(42, 82, 152, 0.1);
+        }
+
+        .security-pyramid {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #f59e0b;
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        .security-pyramid::before {
+            content: "🔐";
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #f59e0b;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+        }
+
+        .comparison-table {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .comparison-card {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            padding: 25px;
+            border-radius: 15px;
+            border-top: 4px solid #2a5298;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .comparison-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .comparison-card h4 {
+            color: #2a5298;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: #2a5298;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(42, 82, 152, 0.4);
+        }
+
+        .nav-btn:hover {
+            background: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(42, 82, 152, 0.6);
+        }
+
+        .nav-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .slide-counter {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: #2a5298;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .concept-diagram {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .concept-item {
+            background: linear-gradient(135deg, #ddd6fe, #c7d2fe);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+            transition: transform 0.3s ease;
+        }
+
+        .concept-item:hover {
+            transform: scale(1.05);
+        }
+
+        .concept-item h4 {
+            color: #4c1d95;
+            margin-bottom: 10px;
+        }
+
+        .hierarchy-visual {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .hierarchy-level {
+            background: white;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .arrow-down {
+            font-size: 2rem;
+            color: #2a5298;
+            margin: 10px 0;
+        }
+
+        .important-note {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border: 2px solid #ef4444;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .important-note::before {
+            content: "⚠️";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+        }
+
+        .best-practices {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            border: 2px solid #22c55e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .best-practices::before {
+            content: "✅";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #22c55e;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+        }
+
+        .vs-comparison {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: center;
+            margin: 30px 0;
+        }
+
+        .vs-left, .vs-right {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .vs-center {
+            background: #2a5298;
+            color: white;
+            padding: 15px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="slide-counter">
+            <span id="current-slide">1</span> / <span id="total-slides">9</span>
+        </div>
+
+        <!-- Slide 1: Portada -->
+        <div class="slide active">
+            <h1>Modelo de Seguridad de Salesforce</h1>
+            <div class="security-pyramid">
+                <h2 style="color: #92400e; margin-bottom: 20px;">Roles • Perfiles • Usuarios • Conjuntos de Permisos</h2>
+                <p style="font-size: 1.3rem; color: #78350f; margin-top: 20px;">Fundamentos para controlar el acceso y la seguridad en Salesforce</p>
+            </div>
+            
+            <div class="concept-diagram">
+                <div class="concept-item">
+                    <h4>👤 Usuarios</h4>
+                    <p>Quién puede acceder</p>
+                </div>
+                <div class="concept-item">
+                    <h4>🎭 Perfiles</h4>
+                    <p>Qué pueden hacer</p>
+                </div>
+                <div class="concept-item">
+                    <h4>🏢 Roles</h4>
+                    <p>Qué pueden ver</p>
+                </div>
+                <div class="concept-item">
+                    <h4>🔑 Conjuntos de Permisos</h4>
+                    <p>Permisos adicionales</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Usuarios -->
+        <div class="slide">
+            <h2>👤 Usuarios</h2>
+            
+            <div class="highlight-box">
+                <h3>Definición</h3>
+                <p>Un <strong>Usuario</strong> es cualquier persona que tiene credenciales para acceder a tu organización de Salesforce.</p>
+            </div>
+
+            <h3>Características de los Usuarios:</h3>
+            <ul>
+                <li><strong>Identidad única:</strong> Cada usuario tiene un username único en todo Salesforce</li>
+                <li><strong>Licencia asignada:</strong> Determina qué funcionalidades pueden usar</li>
+                <li><strong>Perfil obligatorio:</strong> Todo usuario debe tener exactamente un perfil</li>
+                <li><strong>Rol opcional:</strong> Los usuarios pueden tener o no un rol asignado</li>
+                <li><strong>Estado activo/inactivo:</strong> Se pueden desactivar sin eliminar datos</li>
+            </ul>
+
+            <h3>Tipos de Licencias Principales:</h3>
+            <div class="comparison-table">
+                <div class="comparison-card">
+                    <h4>Salesforce</h4>
+                    <p>Licencia completa con acceso a todos los objetos estándar y personalizados</p>
+                </div>
+                <div class="comparison-card">
+                    <h4>Platform</h4>
+                    <p>Acceso limitado, principalmente a objetos personalizados</p>
+                </div>
+                <div class="comparison-card">
+                    <h4>Community</h4>
+                    <p>Para usuarios externos (clientes, socios)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Perfiles -->
+        <div class="slide">
+            <h2>🎭 Perfiles</h2>
+            
+            <div class="highlight-box">
+                <h3>Definición</h3>
+                <p>Un <strong>Perfil</strong> define qué puede hacer un usuario en Salesforce. Controla permisos de objetos, campos, aplicaciones y funciones del sistema.</p>
+            </div>
+
+            <h3>¿Qué controlan los Perfiles?</h3>
+            <ul>
+                <li><strong>Permisos de objetos:</strong> Crear, leer, editar, eliminar registros</li>
+                <li><strong>Permisos de campos:</strong> Ver y editar campos específicos</li>
+                <li><strong>Permisos de aplicaciones:</strong> Acceso a apps y pestañas</li>
+                <li><strong>Permisos del sistema:</strong> Administrar usuarios, modificar configuración</li>
+                <li><strong>Configuración de contraseña:</strong> Políticas de seguridad</li>
+                <li><strong>Horarios de acceso:</strong> Cuándo pueden acceder</li>
+                <li><strong>Restricciones de IP:</strong> Desde dónde pueden acceder</li>
+            </ul>
+
+            <div class="important-note">
+                <h3 style="color: #b91c1c; margin-top: 15px;">Importante</h3>
+                <p>Cada usuario debe tener exactamente UN perfil. Los perfiles solo pueden OTORGAR permisos, nunca QUITAR permisos que ya tiene el usuario por su licencia.</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Perfiles Estándar vs Personalizados -->
+        <div class="slide">
+            <h2>Perfiles Estándar vs Personalizados</h2>
+            
+            <div class="vs-comparison">
+                <div class="vs-left">
+                    <h3>Perfiles Estándar</h3>
+                    <ul style="text-align: left;">
+                        <li>Vienen preconfigurados con Salesforce</li>
+                        <li>System Administrator</li>
+                        <li>Standard User</li>
+                        <li>Marketing User</li>
+                        <li>Solution Manager</li>
+                        <li>Contract Manager</li>
+                        <li>Read Only</li>
+                    </ul>
+                </div>
+                <div class="vs-center">VS</div>
+                <div class="vs-right">
+                    <h3>Perfiles Personalizados</h3>
+                    <ul style="text-align: left;">
+                        <li>Creados por los administradores</li>
+                        <li>Basados en perfiles estándar</li>
+                        <li>Adaptados a necesidades específicas</li>
+                        <li>Ejemplos: "Vendedor Senior", "Soporte Nivel 1"</li>
+                        <li>Mayor flexibilidad y control</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3 style="color: #166534; margin-top: 15px;">Mejores Prácticas</h3>
+                <ul>
+                    <li>Usar perfiles personalizados para mayor control</li>
+                    <li>Mantener perfiles estándar como respaldo</li>
+                    <li>Documentar el propósito de cada perfil personalizado</li>
+                    <li>Revisar periódicamente los permisos de los perfiles</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 5: Roles -->
+        <div class="slide">
+            <h2>🏢 Roles</h2>
+            
+            <div class="highlight-box">
+                <h3>Definición</h3>
+                <p>Los <strong>Roles</strong> controlan el nivel de visibilidad que tiene un usuario sobre los registros de la organización. Se basan en la jerarquía organizacional.</p>
+            </div>
+
+            <h3>¿Qué controlan los Roles?</h3>
+            <ul>
+                <li><strong>Visibilidad de datos:</strong> Qué registros puede ver un usuario</li>
+                <li><strong>Jerarquía organizacional:</strong> Refleja la estructura de la empresa</li>
+                <li><strong>Acceso hacia arriba:</strong> Los roles superiores ven datos de roles inferiores</li>
+                <li><strong>Sharing rules:</strong> Base para reglas de compartición</li>
+            </ul>
+
+            <div class="hierarchy-visual">
+                <h3>Ejemplo de Jerarquía de Roles</h3>
+                <div class="hierarchy-level">
+                    <strong>CEO</strong> - Ve todos los datos
+                </div>
+                <div class="arrow-down">↓</div>
+                <div class="hierarchy-level">
+                    <strong>VP Ventas</strong> - Ve datos de ventas
+                </div>
+                <div class="arrow-down">↓</div>
+                <div class="hierarchy-level">
+                    <strong>Gerente Regional</strong> - Ve su región
+                </div>
+                <div class="arrow-down">↓</div>
+                <div class="hierarchy-level">
+                    <strong>Vendedor</strong> - Ve sus propios datos
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Configuración OWD (Organization-Wide Defaults) -->
+        <div class="slide">
+            <h2>🔒 OWD y Compartición de Datos</h2>
+            
+            <div class="highlight-box">
+                <h3>Organization-Wide Defaults (OWD)</h3>
+                <p>Define el nivel <strong>mínimo</strong> de acceso que tienen los usuarios a los registros que no son de su propiedad.</p>
+            </div>
+
+            <h3>Niveles de OWD:</h3>
+            <div class="comparison-table">
+                <div class="comparison-card">
+                    <h4>🔒 Private</h4>
+                    <p>Solo el propietario y usuarios superiores en la jerarquía pueden ver el registro</p>
+                </div>
+                <div class="comparison-card">
+                    <h4>👀 Read Only</h4>
+                    <p>Todos pueden ver el registro, pero solo el propietario puede editarlo</p>
+                </div>
+                <div class="comparison-card">
+                    <h4>✏️ Read/Write</h4>
+                    <p>Todos pueden ver y editar el registro</p>
+                </div>
+                <div class="comparison-card">
+                    <h4>🎛️ Controlled by Parent</h4>
+                    <p>El acceso se hereda del registro padre (para objetos detalle)</p>
+                </div>
+            </div>
+
+            <div class="important-note">
+                <h3 style="color: #b91c1c; margin-top: 15px;">Principio Clave</h3>
+                <p>Los roles pueden AMPLIAR el acceso definido por OWD, pero nunca RESTRINGIRLO. Siempre se parte del acceso mínimo (OWD) y se va ampliando.</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Conjuntos de Permisos -->
+        <div class="slide">
+            <h2>🔑 Conjuntos de Permisos (Permission Sets)</h2>
+            
+            <div class="highlight-box">
+                <h3>Definición</h3>
+                <p>Los <strong>Conjuntos de Permisos</strong> permiten otorgar permisos adicionales a usuarios específicos sin cambiar su perfil.</p>
+            </div>
+
+            <h3>¿Cuándo usar Conjuntos de Permisos?</h3>
+            <ul>
+                <li><strong>Permisos temporales:</strong> Acceso por tiempo limitado</li>
+                <li><strong>Permisos específicos:</strong> Solo algunos usuarios de un perfil necesitan ciertos permisos</li>
+                <li><strong>Roles múltiples:</strong> Un usuario que cumple varias funciones</li>
+                <li><strong>Proyectos especiales:</strong> Acceso adicional para tareas específicas</li>
+            </ul>
+
+            <div class="vs-comparison">
+                <div class="vs-left">
+                    <h3>Perfiles</h3>
+                    <ul style="text-align: left;">
+                        <li>Uno por usuario</li>
+                        <li>Obligatorio</li>
+                        <li>Define permisos base</li>
+                        <li>Más difícil de cambiar</li>
+                    </ul>
+                </div>
+                <div class="vs-center">VS</div>
+                <div class="vs-right">
+                    <h3>Conjuntos de Permisos</h3>
+                    <ul style="text-align: left;">
+                        <li>Múltiples por usuario</li>
+                        <li>Opcional</li>
+                        <li>Agrega permisos extra</li>
+                        <li>Fácil de asignar/desasignar</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Cómo Trabajan Juntos -->
+        <div class="slide">
+            <h2>🔄 Cómo Trabajan Juntos</h2>
+            
+            <div class="hierarchy-visual">
+                <h3>Flujo de Acceso a un Registro</h3>
+                <div class="hierarchy-level">
+                    <strong>1. Licencia del Usuario</strong><br>
+                    ¿Puede acceder a este tipo de objeto?
+                </div>
+                <div class="arrow-down">↓</div>
+                <div class="hierarchy-level">
+                    <strong>2. Perfil</strong><br>
+                    ¿Tiene permisos CRUD sobre el objeto?
+                </div>
+                <div class="arrow-down">↓</div>
+                <div class="hierarchy-level">
+                    <strong>3. OWD + Rol</strong><br>
+                    ¿Puede ver este registro específico?
+                </div>
+                <div class="arrow-down">↓</div>
+                <div class="hierarchy-level">
+                    <strong>4. Sharing Rules</strong><br>
+                    ¿Hay reglas que amplíen el acceso?
+                </div>
+                <div class="arrow-down">↓</div>
+                <div class="hierarchy-level">
+                    <strong>5. Manual Sharing</strong><br>
+                    ¿Se compartió manualmente?
+                </div>
+            </div>
+
+            <div class="best-practices">
+                <h3 style="color: #166534; margin-top: 15px;">Enfoque Recomendado</h3>
+                <ul>
+                    <li><strong>Perfil:</strong> Permisos mínimos necesarios para el rol</li>
+                    <li><strong>Conjuntos de Permisos:</strong> Permisos adicionales específicos</li>
+                    <li><strong>Roles:</strong> Reflejar la estructura organizacional real</li>
+                    <li><strong>OWD:</strong> Empezar restrictivo, abrir según necesidad</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 9: Mejores Prácticas y Casos Comunes -->
+        <div class="slide">
+            <h2>✅ Mejores Prácticas</h2>
+            
+            <div class="best-practices">
+                <h3 style="color: #166534; margin-top: 15px;">Estrategia de Perfiles</h3>
+                <ul>
+                    <li>Crear perfiles por función de negocio, no por persona</li>
+                    <li>Mantener perfiles simples y usar conjuntos de permisos para excepciones</li>
+                    <li>Documentar el propósito de cada perfil</li>
+                    <li>Revisar permisos regularmente</li>
+                </ul>
+            </div>
+
+            <div class="best-practices">
+                <h3 style="color: #166534; margin-top: 15px;">Estrategia de Roles</h3>
+                <ul>
+                    <li>Reflejar la estructura organizacional real</li>
+                    <li>No crear roles innecesarios</li>
+                    <li>Considerar las implicaciones de sharing</li>
+                    <li>Planificar para el crecimiento futuro</li>
+                </ul>
+            </div>
+
+            <div class="important-note">
+                <h3 style="color: #b91c1c; margin-top: 15px;">Errores Comunes a Evitar</h3>
+                <ul>
+                    <li>Crear un perfil por cada usuario</li>
+                    <li>Dar permisos de administrador a usuarios regulares</li>
+                    <li>No documentar la estrategia de seguridad</li>
+                    <li>Copiar perfiles sin entender sus permisos</li>
+                    <li>No revisar permisos después de cambios organizacionales</li>
+                </ul>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Recuerda: Principio de Menor Privilegio</h3>
+                <p>Siempre otorga los <strong>mínimos permisos necesarios</strong> para que los usuarios puedan hacer su trabajo. Es más fácil agregar permisos después que quitarlos.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            if (direction === 1 && currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            } else if (direction === -1 && currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>
